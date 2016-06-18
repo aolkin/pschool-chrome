@@ -4,11 +4,18 @@
     var weighted  = false;
     var fracpercents = {};
 
-    jQuery(".box-round:eq(3) table tr").each(function(index,el){
-	if(jQuery(el).children("td:eq(0)").text() == "Category Based") {
-	    weights[jQuery(el).children("td:eq(1)").text()] = Number(jQuery(el).children("td:eq(2)").text());
-	    weighted = true;
-	}
+    var termRegex = /Assignment Scores \(([A-Za-z0-9]+)\)/
+    var termName = termRegex.exec(jQuery(".box-round:eq(2) h2").text())[1];
+
+    jQuery(".box-round:eq(3) table tbody").each(function (index, el) {
+      if (jQuery(el).children("tr:eq(0)").children("th:eq(0)").text().split(" ")[1] === termName) {
+        jQuery(el).children("tr").each(function (index, el) {
+          if (jQuery(el).children("td:eq(0)").text() === "Category Based") {
+            weights[jQuery(el).children("td:eq(1)").text()] = Number(jQuery(el).children("td:eq(2)").text());
+            weighted = true;
+          }
+        });
+      }
     });
 
     jQuery(".box-round:eq(0) table:eq(0) tr td:eq(3)").html(jQuery(".box-round:eq(0) table:eq(0) tr td:eq(3)").html()+" (<span id=\"percent-calc-chrome\"></span>%)");
@@ -21,7 +28,7 @@
 	    jQuery(".box-round:eq(1) table tbody tr").each(function(index, el) {
 		categories[jQuery(el).children("td:eq(0)").text().split(" (")[0]] = Number(jQuery(el).children("td:eq(3)").text()) / Number(jQuery(el).children("td:eq(2)").text())
 	    });
-	    
+
 	    for (i in categories) {
 		total += weights[i]
 	    }
